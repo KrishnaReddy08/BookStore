@@ -3,7 +3,6 @@ package com.project.BookStore.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,10 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.project.BookStore.DTO.responseStructure;
 import com.project.BookStore.model.orderDetails;
 import com.project.BookStore.model.orderDetailsDummy;
 import com.project.BookStore.service.orderDetailService;
@@ -28,53 +26,54 @@ public class orderDetailController {
 	private orderDetailService service;
 	
 	
+	@PostMapping("/admin/placeorder")
+	public ResponseEntity<responseStructure<orderDetails>> placeAnOrder(@RequestBody orderDetailsDummy order){
+		return service.placeAnOrder(order);
+	}
+	
 	@PostMapping("/placeorder")
-	public ResponseEntity<?> placeAnOrder(@RequestBody orderDetailsDummy order){
-		try {
-			return new ResponseEntity<>(service.placeAnOrder(order),HttpStatus.OK);
-		}
-		catch(Exception e) {
-			return new ResponseEntity<>("500 Internal server Error\n -> check either entered non excisting Order Id\n -> check either entered all fields",HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+	public ResponseEntity<responseStructure<orderDetails>> placeOrder(@RequestBody orderDetailsDummy order){
+		return service.placeOrder(order);
 	}
 	
 	
-	@GetMapping("/vieworder/{id}")
-	public ResponseEntity<?> viewOrder(@PathVariable int id){
-		try {
-			return new ResponseEntity<>(service.viewOrder(id),HttpStatus.FOUND);
-		}
-		catch(Exception e){
-			return new ResponseEntity<>("404 No Order Found With The Specified Order Id",HttpStatus.OK);
-		}
+	@GetMapping("/admin/vieworder/{id}")
+	public ResponseEntity<responseStructure<orderDetails>> viewOrder(@PathVariable int id){
+		return service.viewOrder(id);
 	}
 	
 	
+	@GetMapping("/admin/viewallorders")
+	public ResponseEntity<responseStructure<List<orderDetails>>> viewAllOrdersAdmin(){
+		return service.viewAllOrdersAdmin();
+	}
+	
+
 	@GetMapping("/viewallorders")
-	public List<orderDetails> viewAllOrders(){
+	public ResponseEntity<responseStructure<List<orderDetails>>> viewAllOrders(){
 		return service.viewAllOrders();
 	}
+
 	
+	@PutMapping("/admin/updateorder/{Id}")
+	public ResponseEntity<responseStructure<orderDetails>> updateOrder(@RequestBody orderDetailsDummy order, @PathVariable int Id){
+		return service.updateOrderAdmin(order, Id);
+	}
 	
 	@PutMapping("/updateorder/{Id}")
-	public ResponseEntity<?> updateOrder(@RequestBody orderDetailsDummy order, @PathVariable int Id){
-		try {
-			return new ResponseEntity<>(service.updateOrder(order,Id),HttpStatus.OK);
-		}
-		catch(Exception e) {
-			return new ResponseEntity<>("500 Internal Server Error Unable To Update. \n ->Check Customer Or Book With The Specified Id Excists.",HttpStatus.INTERNAL_SERVER_ERROR );
-		}
+	public ResponseEntity<responseStructure<orderDetails>> updateOrder(@PathVariable int Id, @RequestBody orderDetailsDummy order){
+		return service.updateOrderUser(Id, order);
 	}
 	
 	
+	@DeleteMapping("/admin/deleteorder/{id}")
+	public ResponseEntity<responseStructure<orderDetails>> deleteOrderAdmin(@PathVariable int id){
+		return service.deleteOrderAdmin(id);
+	}
+	
 	@DeleteMapping("/deleteorder/{id}")
-	public ResponseEntity<?> deleteOrder(@PathVariable int id){
-		try {
-			return new ResponseEntity<>(service.deleteOrder(id),HttpStatus.OK);
-		}
-		catch(Exception e) {
-			return new ResponseEntity<>("404 Order Details Not Found.\n ->Unable To Delete.",HttpStatus.NOT_FOUND );
-		}
+	public ResponseEntity<responseStructure<orderDetails>> deleteOrder(@PathVariable int id){
+		return service.deleteOrder(id);
 	}
 	
 }

@@ -3,9 +3,6 @@ package com.project.BookStore.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +12,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.BookStore.AuthenticatedUser.AuthenticatedUserDetails;
+import com.project.BookStore.DTO.responseStructure;
+import com.project.BookStore.model.CustomerDummy;
 import com.project.BookStore.model.customer;
+import com.project.BookStore.repository.userCredentialsRepo;
 import com.project.BookStore.service.customerDetailService;
 
 
@@ -23,86 +24,56 @@ import com.project.BookStore.service.customerDetailService;
 public class customerDetailController {
 	
 	@Autowired
+	private userCredentialsRepo userRepo;
+	
+	@Autowired
 	private customerDetailService service;
 	
 	@PostMapping("/addcustomer")
-	public ResponseEntity<?> addCustomer(@RequestBody customer customer) {
-		try {
-		return new ResponseEntity<>(service.addCustomer(customer),HttpStatus.OK);
-		}
-		catch (Exception e) {
-			return new ResponseEntity<>("500 Internal server Error\n -> check either entered non excisting Customer Id\n -> check either entered all fields",HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+	public  ResponseEntity<responseStructure<customer>> addCustomer(@RequestBody CustomerDummy customer) {
+		System.out.println("in controller"+customer);
+		return service.addCustomer(customer);
 	}
 	
 	
 	@GetMapping("/viewallcustomers")
-	public List<customer> viewAllCustomers() {
+	public ResponseEntity<responseStructure<List<customer>>> viewAllCustomers() {
 		return service.viewAllCustomers();
 	}
 	
 	
 	@GetMapping("/viewcustomer/{id}")
-	public ResponseEntity<?> viewById(@PathVariable int id) {
-		try {
-		return new ResponseEntity<>(service.viewCustomerById(id),HttpStatus.FOUND);
-		}
-		catch(Exception e) {
-			return new ResponseEntity<>("404 Customer With Specified Id Not Found",HttpStatus.NOT_FOUND);
-		}
+	public ResponseEntity<responseStructure<customer>> viewById(@PathVariable int id) {
+			return service.viewCustomerById(id);
 	}
 	
+	@GetMapping("/viewcustomerdetails")
+	public ResponseEntity<responseStructure<customer>> viewCustomer() {
+		int Id = userRepo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
+			return service.viewCustomerById(Id);
+	}
 	
 	@GetMapping("/viewcustomerbyname/{name}")
-	public ResponseEntity<?> viewByName(@PathVariable String name) {
-		
-		if(service.viewCustomerByName(name)!=null) 
-			return new ResponseEntity<>(service.viewCustomerByName(name),HttpStatus.FOUND);
-		
-		else
-			return new ResponseEntity<>("404 Customer With Specified Name Not Found",HttpStatus.NOT_FOUND);
+	public  ResponseEntity<responseStructure<List<customer>>> viewByName(@PathVariable String name) {
+		return service.viewCustomerByName(name);
 	}
 	
 	
 	@PutMapping("/updatecustomer/{id}")
-	public ResponseEntity<?> upadteCustomer(@PathVariable int id,@RequestBody customer customer) {
-		try {
-			return new ResponseEntity<>(service.updateCustomerDetail(customer,id),HttpStatus.OK);
-		}
-		catch(DataIntegrityViolationException e) {
-			return new ResponseEntity<>("Enter All Fields",HttpStatus.BAD_REQUEST);
-		}
-		catch(Exception e) {
-			return new ResponseEntity<>("404 Customer With Specified Id Not Found",HttpStatus.NOT_FOUND);
-		}	
+	public  ResponseEntity<responseStructure<customer>> upadteCustomer(@PathVariable int id,@RequestBody customer customer) {
+		return service.updateCustomerDetail(customer, id);
 	}
 	
 	
 	@DeleteMapping("/deletecustomer/{id}")
-	public ResponseEntity<?> deleteCustomerById(@PathVariable int id) {
-		try {
-			return new ResponseEntity<>(service.deleteCustomerById(id),HttpStatus.OK);
-		}
-		catch(DataAccessException e){
-			return new ResponseEntity<>("Cannot delete a parent row",HttpStatus.BAD_REQUEST);
-		}
-		catch(Exception e){
-			return new ResponseEntity<>("404 Not Found",HttpStatus.NOT_FOUND);
-		}
+	public  ResponseEntity<responseStructure<customer>> deleteCustomerById(@PathVariable int id) {
+		return service.deleteCustomerById(id);
 	}
 	
 	
 	@DeleteMapping("/deletecustomerbyname/{name}")
-	public ResponseEntity<?> deleteCustomerByname(@PathVariable String name) {
-		try {
-			return new ResponseEntity<>(service.deleteCustomerByName(name),HttpStatus.OK);
-		}
-		catch(DataAccessException e){
-			return new ResponseEntity<>("Cannot delete a parent row",HttpStatus.BAD_REQUEST);
-		}
-		catch(Exception e) {
-			return new ResponseEntity<>("404 Not Found",HttpStatus.NOT_FOUND);
-		}
+	public  ResponseEntity<responseStructure<List<customer>>> deleteCustomerByname(@PathVariable String name) {
+		return service.deleteCustomerByName(name);
 	}
 			
 }

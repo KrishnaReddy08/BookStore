@@ -9,15 +9,21 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
-
+import jakarta.persistence.OneToOne;
 
 
 @Entity
 public class customer {
-	
 	@Id
 	private int customerId;
+	
+	@OneToOne
+	@MapsId
+	@JoinColumn(name = "customerId")
+	private userCredentials userCredentials;
 	
 	@Column(nullable = false)
 	private String name;
@@ -32,6 +38,13 @@ public class customer {
 												CascadeType.REFRESH})
 	private List<orderDetails> orderdetails;
 	
+	
+	public userCredentials getUserCredentials() {
+		return userCredentials;
+	}
+	public void setUserCredentials(userCredentials userCredentials) {
+		this.userCredentials = userCredentials;
+	}
 	
 	public int getCustomerId() {
 		return customerId;
@@ -57,12 +70,10 @@ public class customer {
 	public void setOrderdetails(List<orderDetails> orderdetails) {
 		this.orderdetails = orderdetails;
 	}
-	
-	
 	@Override
 	public String toString() {
-		return "customer [customerId=" + customerId + ", name=" + name + ", email=" + email + "]";
+		return "customer [customerId=" + customerId + ", name=" + name + ", email=" + email + ", orderdetails="
+				+ orderdetails + "]";
 	}
-	
 	
 }
