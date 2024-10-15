@@ -3,18 +3,26 @@ package com.project.BookStore.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.project.BookStore.AuthenticatedUser.AuthenticatedUserDetails;
+import com.project.BookStore.DTO.CustomerDetailDTO;
+import com.project.BookStore.DTO.OrderDetailDTO;
 import com.project.BookStore.DTO.responseStructure;
 import com.project.BookStore.exception.CustomerNotFoundException;
-import com.project.BookStore.model.CustomerDummy;
+import com.project.BookStore.exception.UserNotFoundException;
 import com.project.BookStore.model.customer;
+import com.project.BookStore.model.orderDetails;
 import com.project.BookStore.model.userCredentials;
 import com.project.BookStore.repository.customerRepo;
 import com.project.BookStore.repository.userCredentialsRepo;
+
+import jakarta.transaction.Transactional;
 
 
 @Service
@@ -27,20 +35,37 @@ public class customerDetailService{
 	@Autowired
 	private userCredentialsRepo credentialsRepo;
 	
-	public ResponseEntity<responseStructure<customer>> addCustomer(CustomerDummy customer){	
-		responseStructure<customer> structure = new responseStructure<customer>();
-		userCredentials UserCred = credentialsRepo.findById(customer.getCustomerId()).get();
+	public CustomerDetailDTO CustomerDTOConvertor(customer Customer) {
+		CustomerDetailDTO DTO = new CustomerDetailDTO();
+		DTO.setCustomerId(Customer.getCustomerId());
+		DTO.setName(Customer.getName());
+		DTO.setEmail(Customer.getEmail());
+		return DTO;
+	}
+	
+	public List<CustomerDetailDTO> convertToCustomerDetailTOList(List<CustomerDetailDTO> Customers) {
+	    return Customers.stream()
+	                 .map(this::CustomerDTOConvertor)
+	                 .collect(Collectors.toList());
+	}
+	
+	@Transactional
+	public ResponseEntity<responseStructure<CustomerDetailDTO>> addCustomer(customer customer){	
+		responseStructure<CustomerDetailDTO> structure = new responseStructure<CustomerDetailDTO>();
+		Optional<userCredentials> UserCred = credentialsRepo.findById(customer.getCustomerId());
+		if(UserCred.isEmpty()) throw new UserNotFoundException("No User With Id "+customer.getCustomerId()+" Exists");
 		customer Customer = new customer();
+		UserCred.get().setCustomer(Customer);
+		Customer.setUserCredentials(UserCred.get());
 		Customer.setCustomerId(customer.getCustomerId());
 		Customer.setEmail(customer.getEmail());
 		Customer.setName(customer.getName());
-		
-		System.out.println("user cred"+Customer.getUserCredentials());
+		credentialsRepo.save(UserCred.get());
 		System.out.println("after adding usercred"+Customer);
-		structure.setData(repo.save(Customer));
+		structure.setData(CustomerDTOConvertor(repo.save(Customer)));
 		structure.setMessage("Added Successfully");
 		structure.setStatus_code(HttpStatus.ACCEPTED.value());
-		return new ResponseEntity<responseStructure<customer>>(structure,HttpStatus.ACCEPTED);
+		return new ResponseEntity<responseStructure<CustomerDetailDTO>>(structure,HttpStatus.ACCEPTED);
 	}
 	
 	
@@ -55,14 +80,14 @@ public class customerDetailService{
 	}
 	
 	
-	public ResponseEntity<responseStructure<customer>> viewCustomerById(int id) {
+	public ResponseEntity<responseStructure<CustomerDetailDTO>> viewCustomerById(int id) {
+		responseStructure<CustomerDetailDTO> structure = new responseStructure<CustomerDetailDTO>();
 		Optional<customer> customer = repo.findById(id);
-		responseStructure<customer> structure = new responseStructure<customer>();
 		if(customer.isPresent()) {
-			structure.setData(customer.get());
+			structure.setData(CustomerDTOConvertor(customer.get()));
 			structure.setMessage("Customer Found");
 			structure.setStatus_code(HttpStatus.FOUND.value());
-			return new ResponseEntity<responseStructure<customer>>(structure,HttpStatus.OK);
+			return new ResponseEntity<responseStructure<CustomerDetailDTO>>(structure,HttpStatus.OK);
 		}
 		throw new CustomerNotFoundException("Customer With Id "+id+" Not Found");
 	}
@@ -81,32 +106,69 @@ public class customerDetailService{
 	}
 	
 	
-	public ResponseEntity<responseStructure<customer>> updateCustomerDetail(customer customer,int id) {
-		responseStructure<customer> structure = new responseStructure<customer>();
+	public ResponseEntity<responseStructure<CustomerDetailDTO>> updateCustomerDetailAdmin(customer customer,int id) {
+		responseStructure<CustomerDetailDTO> structure = new responseStructure<CustomerDetailDTO>();
 		Optional<customer> OptionalCustomer = repo.findById(id);
 		if(OptionalCustomer.isPresent()) {
 			customer Customer = OptionalCustomer.get();
 			Customer.setName(customer.getName());
 			Customer.setEmail(customer.getEmail());
-			structure.setData(repo.save(Customer));
+			structure.setData(CustomerDTOConvertor(repo.save(Customer)));
 			structure.setMessage("Updated Successfully");
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
-			return new ResponseEntity<responseStructure<customer>>(structure,HttpStatus.ACCEPTED);
+			return new ResponseEntity<responseStructure<CustomerDetailDTO>>(structure,HttpStatus.ACCEPTED);
+		}
+		throw new CustomerNotFoundException("Customer With Id "+id+" Not Found");
+	}
+	
+	public ResponseEntity<responseStructure<CustomerDetailDTO>> updateCustomerDetail(customer customer) {
+		responseStructure<CustomerDetailDTO> structure = new responseStructure<CustomerDetailDTO>();
+		int id =credentialsRepo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
+		Optional<customer> OptionalCustomer = repo.findById(id);
+		if(OptionalCustomer.isPresent()) {
+			customer Customer = OptionalCustomer.get();
+			Customer.setName(customer.getName());
+			Customer.setEmail(customer.getEmail());
+			structure.setData(CustomerDTOConvertor(repo.save(Customer)));
+			structure.setMessage("Updated Successfully");
+			structure.setStatus_code(HttpStatus.ACCEPTED.value());
+			return new ResponseEntity<responseStructure<CustomerDetailDTO>>(structure,HttpStatus.ACCEPTED);
 		}
 		throw new CustomerNotFoundException("Customer With Id "+id+" Not Found");
 	}
 	
 	
-	public ResponseEntity<responseStructure<customer>> deleteCustomerById(int id){
+	public ResponseEntity<responseStructure<CustomerDetailDTO>> deleteCustomerById(int id){
+		responseStructure<CustomerDetailDTO> structure = new responseStructure<CustomerDetailDTO>();
 		Optional<customer> OptionalCustomer = repo.findById(id);
-		responseStructure<customer> structure = new responseStructure<customer>();
 		if(OptionalCustomer.isPresent()) {
 			customer Customer = OptionalCustomer.get();
+			Optional<userCredentials> Credentials = credentialsRepo.findById(id);
+			Credentials.get().setCustomer(null);
+			credentialsRepo.save(Credentials.get());
 			repo.deleteById(id);
-			structure.setData(Customer);
+			structure.setData(CustomerDTOConvertor(Customer));
 			structure.setMessage("Deleted Sucessfully");
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
-			return new ResponseEntity<responseStructure<customer>>(structure,HttpStatus.ACCEPTED);
+			return new ResponseEntity<responseStructure<CustomerDetailDTO>>(structure,HttpStatus.ACCEPTED);
+		}
+		throw new CustomerNotFoundException("Customer With Id "+id+" Not Found.Unable To Delete");
+	}
+	
+	public ResponseEntity<responseStructure<CustomerDetailDTO>> deleteCurrentCustomer(){
+		responseStructure<CustomerDetailDTO> structure = new responseStructure<CustomerDetailDTO>();
+		int id =credentialsRepo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
+		Optional<customer> OptionalCustomer = repo.findById(id);
+		if(OptionalCustomer.isPresent()) {
+			customer Customer = OptionalCustomer.get();
+			Optional<userCredentials> Credentials = credentialsRepo.findById(id);
+			Credentials.get().setCustomer(null);
+			credentialsRepo.save(Credentials.get());
+			repo.deleteById(id);
+			structure.setData(CustomerDTOConvertor(Customer));
+			structure.setMessage("Deleted Sucessfully");
+			structure.setStatus_code(HttpStatus.ACCEPTED.value());
+			return new ResponseEntity<responseStructure<CustomerDetailDTO>>(structure,HttpStatus.ACCEPTED);
 		}
 		throw new CustomerNotFoundException("Customer With Id "+id+" Not Found.Unable To Delete");
 	}

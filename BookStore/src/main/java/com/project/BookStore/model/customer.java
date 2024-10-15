@@ -2,7 +2,6 @@ package com.project.BookStore.model;
 
 
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
@@ -17,11 +16,12 @@ import jakarta.persistence.OneToOne;
 
 @Entity
 public class customer {
+	
 	@Id
 	private int customerId;
 	
+	@MapsId("customerId")
 	@OneToOne
-	@MapsId
 	@JoinColumn(name = "customerId")
 	private userCredentials userCredentials;
 	
@@ -32,10 +32,7 @@ public class customer {
 	private String email;
 	
 	@JsonBackReference
-	@OneToMany(mappedBy = "customer",cascade = {CascadeType.DETACH,
-												CascadeType.MERGE,
-												CascadeType.PERSIST,
-												CascadeType.REFRESH})
+	@OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
 	private List<orderDetails> orderdetails;
 	
 	
@@ -72,8 +69,8 @@ public class customer {
 	}
 	@Override
 	public String toString() {
-		return "customer [customerId=" + customerId + ", name=" + name + ", email=" + email + ", orderdetails="
-				+ orderdetails + "]";
+		return "customer [customerId=" + customerId + ", userCredentials=" + userCredentials + ", name=" + name
+				+ ", email=" + email + ", orderdetails=" + orderdetails + "]";
 	}
 	
 }

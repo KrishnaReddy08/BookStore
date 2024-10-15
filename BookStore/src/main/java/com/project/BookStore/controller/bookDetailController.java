@@ -25,7 +25,7 @@ public class bookDetailController {
 	@Autowired
 	bookRepo repo;
 	
-	@PostMapping("/addbook")
+	@PostMapping("/admin/addbook")
 	public ResponseEntity<responseStructure<book>> addBook(@RequestBody book book) {
 		System.out.println(repo.existsByTitle(book.getTitle()));
 		return service.addBook(book);
@@ -50,19 +50,19 @@ public class bookDetailController {
 	}
 	
 	
-	@PutMapping("/updatebook/{id}")
+	@PutMapping("/admin/updatebook/{id}")
 	public ResponseEntity<responseStructure<book>> updateBook(@RequestBody book book,@PathVariable int id) {
 		return service.updateBook(book, id);
 	}
 	
 	
-	@DeleteMapping("/deletebook/{id}")
+	@DeleteMapping("/admin/deletebook/{id}")
 	public ResponseEntity<responseStructure<book>> deleteBook(@PathVariable int id) {
 		return service.deleteBookById(id);
 	}
 	
 	
-	@DeleteMapping("/deletebookbytitle/{title}")
+	@DeleteMapping("/admin/deletebookbytitle/{title}")
 	public ResponseEntity<responseStructure<book>> deleteBookByTitle(@PathVariable String title) {
 		return service.deleteBookByTitle(title);
 	}

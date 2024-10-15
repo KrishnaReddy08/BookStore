@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.BookStore.AuthenticatedUser.AuthenticatedUserDetails;
+import com.project.BookStore.DTO.CustomerDetailDTO;
 import com.project.BookStore.DTO.responseStructure;
-import com.project.BookStore.model.CustomerDummy;
 import com.project.BookStore.model.customer;
 import com.project.BookStore.repository.userCredentialsRepo;
 import com.project.BookStore.service.customerDetailService;
@@ -30,7 +30,7 @@ public class customerDetailController {
 	private customerDetailService service;
 	
 	@PostMapping("/addcustomer")
-	public  ResponseEntity<responseStructure<customer>> addCustomer(@RequestBody CustomerDummy customer) {
+	public  ResponseEntity<responseStructure<CustomerDetailDTO>> addCustomer(@RequestBody customer customer) {
 		System.out.println("in controller"+customer);
 		return service.addCustomer(customer);
 	}
@@ -43,35 +43,44 @@ public class customerDetailController {
 	
 	
 	@GetMapping("/viewcustomer/{id}")
-	public ResponseEntity<responseStructure<customer>> viewById(@PathVariable int id) {
+	public ResponseEntity<responseStructure<CustomerDetailDTO>> viewById(@PathVariable int id) {
 			return service.viewCustomerById(id);
 	}
 	
-	@GetMapping("/viewcustomerdetails")
-	public ResponseEntity<responseStructure<customer>> viewCustomer() {
+	@GetMapping("/viewcurrentcustomer")
+	public ResponseEntity<responseStructure<CustomerDetailDTO>> viewCustomer() {
 		int Id = userRepo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
 			return service.viewCustomerById(Id);
 	}
 	
-	@GetMapping("/viewcustomerbyname/{name}")
+	@GetMapping("/admin/viewcustomerbyname/{name}")
 	public  ResponseEntity<responseStructure<List<customer>>> viewByName(@PathVariable String name) {
 		return service.viewCustomerByName(name);
 	}
 	
 	
-	@PutMapping("/updatecustomer/{id}")
-	public  ResponseEntity<responseStructure<customer>> upadteCustomer(@PathVariable int id,@RequestBody customer customer) {
-		return service.updateCustomerDetail(customer, id);
+	@PutMapping("/admin/updatecustomer/{id}")
+	public  ResponseEntity<responseStructure<CustomerDetailDTO>> upadteCustomer(@PathVariable int id,@RequestBody customer customer) {
+		return service.updateCustomerDetailAdmin(customer, id);
+	}
+	
+	@PutMapping("/updatecustomer")
+	public  ResponseEntity<responseStructure<CustomerDetailDTO>> upadteCustomer(@RequestBody customer customer) {
+		return service.updateCustomerDetail(customer);
 	}
 	
 	
-	@DeleteMapping("/deletecustomer/{id}")
-	public  ResponseEntity<responseStructure<customer>> deleteCustomerById(@PathVariable int id) {
+	@DeleteMapping("/admin/deletecustomer/{id}")
+	public  ResponseEntity<responseStructure<CustomerDetailDTO>> deleteCustomerById(@PathVariable int id) {
 		return service.deleteCustomerById(id);
 	}
 	
+	@DeleteMapping("/deletecurrentcustomer")
+	public  ResponseEntity<responseStructure<CustomerDetailDTO>> deleteCurrentCustomer(){
+		return service.deleteCurrentCustomer();
+	}
 	
-	@DeleteMapping("/deletecustomerbyname/{name}")
+	@DeleteMapping("/admin/deletecustomerbyname/{name}")
 	public  ResponseEntity<responseStructure<List<customer>>> deleteCustomerByname(@PathVariable String name) {
 		return service.deleteCustomerByName(name);
 	}

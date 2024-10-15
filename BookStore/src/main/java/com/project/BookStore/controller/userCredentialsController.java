@@ -21,22 +21,22 @@ public class userCredentialsController {
 	@Autowired
 	private userCredentialsService service;
 	
-	@GetMapping("/viewuser/{Id}")
+	@GetMapping("/admin/viewuser/{Id}")
 	public ResponseEntity<responseStructure<userCredentials>> viewUser(@PathVariable int Id){
 		return service.viewUserAdmin(Id);
 	}
 	
-	@GetMapping("/viewuser")
+	@GetMapping("/viewcurrentuser")
 	public ResponseEntity<responseStructure<userCredentials>> viewUser(){
 		return service.viewUser();
 	}
 	
-	@PostMapping("/addnewuser")
+	@PostMapping("/admin/addnewuser")
 	public ResponseEntity<responseStructure<userCredentials>> addNewUser(@RequestBody userCredentials credentials){
 		return service.addNewUser(credentials);
 	}
 	
-	@PutMapping("/updateuser/{Id}")
+	@PutMapping("/admin/updateuser/{Id}")
 	public ResponseEntity<responseStructure<userCredentials>> UpdateUser(@PathVariable int Id,@RequestBody userCredentials credentials){
 		return service.UpdateUser(Id, credentials);
 	}
@@ -51,7 +51,7 @@ public class userCredentialsController {
 		return service.deleteUser(Id);
 	}
 	
-	@DeleteMapping("/deleteuser")
+	@DeleteMapping("/deletecurrentuser")
 	public ResponseEntity<responseStructure<userCredentials>> DeleteUser(){
 		return service.deleteCurrentUser();
 	}

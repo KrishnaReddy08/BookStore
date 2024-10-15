@@ -19,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 
 @Component
 @Entity
@@ -26,22 +27,22 @@ public class userCredentials {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int customerId;
+	
 	@Column(nullable = false, unique = true)
 	private String username;
+	
 	@Column(nullable = false)
 	private String password;
 	
 	
-	@ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+	@ElementCollection(targetClass = Role.class,fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns =  @JoinColumn(name = "customerId"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 	
 	@JsonBackReference
-	@OneToOne(mappedBy = "userCredentials",cascade = {CascadeType.DETACH,
-			CascadeType.MERGE,
-			CascadeType.PERSIST,
-			CascadeType.REFRESH})
+	@OneToOne(mappedBy = "userCredentials",cascade = CascadeType.ALL)
+	@PrimaryKeyJoinColumn
 	private customer customer;
 	
 	

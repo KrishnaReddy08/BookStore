@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.BookStore.DTO.OrderDetailDTO;
 import com.project.BookStore.DTO.responseStructure;
 import com.project.BookStore.model.orderDetails;
-import com.project.BookStore.model.orderDetailsDummy;
 import com.project.BookStore.service.orderDetailService;
 
 
@@ -27,24 +27,28 @@ public class orderDetailController {
 	
 	
 	@PostMapping("/admin/placeorder")
-	public ResponseEntity<responseStructure<orderDetails>> placeAnOrder(@RequestBody orderDetailsDummy order){
-		return service.placeAnOrder(order);
+	public ResponseEntity<responseStructure<OrderDetailDTO>> placeAnOrder(@RequestBody OrderDetailDTO order){
+		return service.placeOrderAdmin(order);
 	}
 	
 	@PostMapping("/placeorder")
-	public ResponseEntity<responseStructure<orderDetails>> placeOrder(@RequestBody orderDetailsDummy order){
+	public ResponseEntity<responseStructure<OrderDetailDTO>> placeOrder(@RequestBody OrderDetailDTO order){
 		return service.placeOrder(order);
 	}
 	
 	
 	@GetMapping("/admin/vieworder/{id}")
-	public ResponseEntity<responseStructure<orderDetails>> viewOrder(@PathVariable int id){
+	public ResponseEntity<responseStructure<OrderDetailDTO>> viewOrderAdmin(@PathVariable int id){
+		return service.viewOrderAdmin(id);
+	}
+	
+	@GetMapping("/vieworder/{id}")
+	public ResponseEntity<responseStructure<OrderDetailDTO>> viewOrder(@PathVariable int id){
 		return service.viewOrder(id);
 	}
 	
-	
 	@GetMapping("/admin/viewallorders")
-	public ResponseEntity<responseStructure<List<orderDetails>>> viewAllOrdersAdmin(){
+	public ResponseEntity<responseStructure<List<OrderDetailDTO>>> viewAllOrdersAdmin(){
 		return service.viewAllOrdersAdmin();
 	}
 	
@@ -56,23 +60,23 @@ public class orderDetailController {
 
 	
 	@PutMapping("/admin/updateorder/{Id}")
-	public ResponseEntity<responseStructure<orderDetails>> updateOrder(@RequestBody orderDetailsDummy order, @PathVariable int Id){
+	public ResponseEntity<responseStructure<OrderDetailDTO>> updateOrder(@RequestBody OrderDetailDTO order, @PathVariable int Id){
 		return service.updateOrderAdmin(order, Id);
 	}
 	
 	@PutMapping("/updateorder/{Id}")
-	public ResponseEntity<responseStructure<orderDetails>> updateOrder(@PathVariable int Id, @RequestBody orderDetailsDummy order){
+	public ResponseEntity<responseStructure<OrderDetailDTO>> updateOrder(@PathVariable int Id, @RequestBody OrderDetailDTO order){
 		return service.updateOrderUser(Id, order);
 	}
 	
 	
 	@DeleteMapping("/admin/deleteorder/{id}")
-	public ResponseEntity<responseStructure<orderDetails>> deleteOrderAdmin(@PathVariable int id){
+	public ResponseEntity<responseStructure<OrderDetailDTO>> deleteOrderAdmin(@PathVariable int id){
 		return service.deleteOrderAdmin(id);
 	}
 	
 	@DeleteMapping("/deleteorder/{id}")
-	public ResponseEntity<responseStructure<orderDetails>> deleteOrder(@PathVariable int id){
+	public ResponseEntity<responseStructure<OrderDetailDTO>> deleteOrder(@PathVariable int id){
 		return service.deleteOrder(id);
 	}
 	

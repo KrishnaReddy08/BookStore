@@ -20,30 +20,29 @@ public class securityConfiguration{
 	private UserDetailsService service;
 
 	@Bean
-    public SecurityFilterChain filterchain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterchain(HttpSecurity http) throws Exception {
 		return http
 				.csrf(customizer->customizer.disable())
 				.authorizeHttpRequests(
 						auth->{
 							auth.requestMatchers("/").permitAll();
 							auth.requestMatchers("/addbook","/deletebook/**","/deletebookbytitle/**","/updatebook/**",
-									             "/viewallcustomers","/viewcustomerbyname","/viewcustomer/**","/addcustomer","/updatecustomer/**",
+									             "/viewallcustomers","/viewcustomerbyname","/viewcustomer/**","/addcustomer",
 									             "/deletecustomer/**","/deletecustomerbyname/**",
 									             "/updateuser/**","/addnewuser","/admin/**")
 												.hasRole("ADMIN");
 							auth.requestMatchers("/viewallbooks","/viewbook/**","/viewbookbytitle/**","/viewcustomerdetails","/updateorder/**",
-												 "/deleteorder/**","/placeorder","/vieworder/**","/viewallorders","/updatecurrentuser")
+												 "/deleteorder/**","/placeorder","/vieworder/**","/viewallorders","/updatecustomer","/updatecurrentuser")
 							                    .hasAnyRole("ADMIN","USER");
 						})
 				.authorizeHttpRequests(request->request.anyRequest().authenticated())
 				.httpBasic(Customizer.withDefaults())
-				.exceptionHandling(exception->exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
 				.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.build();		
 	}
 
     @Bean
-    public AuthenticationProvider authentication() {
+    AuthenticationProvider authentication() {
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 		provider.setPasswordEncoder(new BCryptPasswordEncoder(10));
 		provider.setUserDetailsService(service);
