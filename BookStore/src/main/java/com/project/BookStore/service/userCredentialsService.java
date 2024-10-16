@@ -7,12 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.project.BookStore.AuthenticatedUser.AuthenticatedUserDetails;
 import com.project.BookStore.DTO.responseStructure;
 import com.project.BookStore.config.userDetailConfig;
+import com.project.BookStore.exception.InvalidRequestException;
 import com.project.BookStore.exception.UserNotFoundException;
 import com.project.BookStore.model.userCredentials;
 import com.project.BookStore.repository.userCredentialsRepo;
@@ -34,13 +34,16 @@ public class userCredentialsService implements UserDetailsService {
 	
 	public ResponseEntity<responseStructure<userCredentials>> viewUserAdmin(int Id){
 		responseStructure<userCredentials> structure = new responseStructure<userCredentials>();
-		structure.setData(repo.findById(Id).get());
-		structure.setMessage("USER FOUND");
-		structure.setStatus_code(HttpStatus.FOUND.value());
-		return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.FOUND);
+		Optional<userCredentials> credentials = repo.findById(Id);
+		if(credentials.isPresent()) {
+			structure.setData(repo.findById(Id).get());
+			structure.setMessage("USER FOUND");
+			structure.setStatus_code(HttpStatus.FOUND.value());
+			return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.FOUND);
+		}throw new UserNotFoundException("User With Id "+Id+" Not Found");
 	}
 	
-	public ResponseEntity<responseStructure<userCredentials>> viewUser(){
+	public ResponseEntity<responseStructure<userCredentials>> viewCurrentUser(){
 		responseStructure<userCredentials> structure = new responseStructure<userCredentials>();
 		int Id =repo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
 		structure.setData(repo.findById(Id).get());
@@ -51,6 +54,7 @@ public class userCredentialsService implements UserDetailsService {
 	
 	public ResponseEntity<responseStructure<userCredentials>> addNewUser(userCredentials credentials){
 		responseStructure<userCredentials> structure = new responseStructure<userCredentials>();
+		if(repo.existsById(credentials.getCustomerId())) throw new InvalidRequestException("User With Id "+credentials.getCustomerId()+" Already Exists");
 		structure.setData(repo.save(credentials));
 		structure.setMessage("Added User");
 		structure.setStatus_code(HttpStatus.ACCEPTED.value());
@@ -62,6 +66,7 @@ public class userCredentialsService implements UserDetailsService {
 		Optional<userCredentials> optionalCredentials = repo.findById(Id);
 		if(optionalCredentials.isPresent()) {
 			userCredentials Credentials = new userCredentials();
+			if(credentials.getRoles()==null) credentials.setRoles(optionalCredentials.get().getRoles());
 			Credentials.setCustomerId(Id);
 			Credentials.setUsername(credentials.getUsername());
 			Credentials.setPassword(credentials.getPassword());
@@ -71,7 +76,7 @@ public class userCredentialsService implements UserDetailsService {
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
 			return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.ACCEPTED);
 		}
-		throw new UsernameNotFoundException("Enter Existing And Valid User Credentials");
+		throw new UserNotFoundException("Enter Existing And Valid User Credentials");
 		
 	}
 	
@@ -80,7 +85,8 @@ public class userCredentialsService implements UserDetailsService {
 		int id = repo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
 		Optional<userCredentials> optionalCredentials = repo.findById(id);
 		if(optionalCredentials.isPresent()) {
-			userCredentials Credentials = new userCredentials();
+			userCredentials Credentials = new userCredentials(); 
+			Credentials.setRoles(optionalCredentials.get().getRoles());
 			Credentials.setCustomerId(id);
 			Credentials.setUsername(credentials.getUsername());
 			Credentials.setPassword(credentials.getPassword());
@@ -89,7 +95,7 @@ public class userCredentialsService implements UserDetailsService {
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
 			return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.ACCEPTED);
 		}
-		throw new UsernameNotFoundException("Enter Existing And Valid User Credentials");
+		throw new UserNotFoundException("Enter Existing And Valid User Credentials");
 	}
 	
 	public ResponseEntity<responseStructure<userCredentials>> deleteUser(int Id){
@@ -101,7 +107,7 @@ public class userCredentialsService implements UserDetailsService {
 			structure.setMessage("User Deleted");
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
 			return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.ACCEPTED);
-		}throw new UsernameNotFoundException("Enter Existing And Valid User Credentials");
+		}throw new UserNotFoundException("Enter Existing And Valid User Credentials");
 	}
 	
 	public ResponseEntity<responseStructure<userCredentials>> deleteCurrentUser(){
@@ -114,6 +120,6 @@ public class userCredentialsService implements UserDetailsService {
 			structure.setMessage("User Deleted");
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
 			return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.ACCEPTED);
-		}throw new UsernameNotFoundException("Enter Existing And Valid User Credentials");
+		}throw new UserNotFoundException("Enter Existing And Valid User Credentials");
 	}
 }

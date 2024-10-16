@@ -26,13 +26,12 @@ public class securityConfiguration{
 				.authorizeHttpRequests(
 						auth->{
 							auth.requestMatchers("/").permitAll();
-							auth.requestMatchers("/addbook","/deletebook/**","/deletebookbytitle/**","/updatebook/**",
-									             "/viewallcustomers","/viewcustomerbyname","/viewcustomer/**","/addcustomer",
-									             "/deletecustomer/**","/deletecustomerbyname/**",
-									             "/updateuser/**","/addnewuser","/admin/**")
+							auth.requestMatchers("/admin/**")
 												.hasRole("ADMIN");
-							auth.requestMatchers("/viewallbooks","/viewbook/**","/viewbookbytitle/**","/viewcustomerdetails","/updateorder/**",
-												 "/deleteorder/**","/placeorder","/vieworder/**","/viewallorders","/updatecustomer","/updatecurrentuser")
+							auth.requestMatchers("/viewcurrentuser","/updatecurrentuser","/deletecurrentuser",
+												 "/deleteorder/**","/viewallorders","/vieworder/**","/updateorder/**",
+												 "/viewcurrentcustomer","/updatecurrentcustomer","/deletecurrentcustomer",
+												 "/viewallbooks","/viewbook/**","/viewbookbytitle/**")
 							                    .hasAnyRole("ADMIN","USER");
 						})
 				.authorizeHttpRequests(request->request.anyRequest().authenticated())

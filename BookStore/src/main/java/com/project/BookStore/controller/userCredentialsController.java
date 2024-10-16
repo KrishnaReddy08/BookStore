@@ -22,13 +22,13 @@ public class userCredentialsController {
 	private userCredentialsService service;
 	
 	@GetMapping("/admin/viewuser/{Id}")
-	public ResponseEntity<responseStructure<userCredentials>> viewUser(@PathVariable int Id){
+	public ResponseEntity<responseStructure<userCredentials>> ViewUserAdmin(@PathVariable int Id){
 		return service.viewUserAdmin(Id);
 	}
 	
 	@GetMapping("/viewcurrentuser")
-	public ResponseEntity<responseStructure<userCredentials>> viewUser(){
-		return service.viewUser();
+	public ResponseEntity<responseStructure<userCredentials>> ViewCurrentUser(){
+		return service.viewCurrentUser();
 	}
 	
 	@PostMapping("/admin/addnewuser")
@@ -41,7 +41,7 @@ public class userCredentialsController {
 		return service.UpdateUser(Id, credentials);
 	}
 	
-	@PutMapping("/updateuser")
+	@PutMapping("/updatecurrentuser")
 	public ResponseEntity<responseStructure<userCredentials>> UpdateUser(@RequestBody userCredentials credentials){
 		return service.UpdateCurrentUser(credentials);
 	}

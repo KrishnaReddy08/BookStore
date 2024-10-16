@@ -12,11 +12,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.BookStore.AuthenticatedUser.AuthenticatedUserDetails;
 import com.project.BookStore.DTO.CustomerDetailDTO;
 import com.project.BookStore.DTO.responseStructure;
 import com.project.BookStore.model.customer;
-import com.project.BookStore.repository.userCredentialsRepo;
 import com.project.BookStore.service.customerDetailService;
 
 
@@ -24,37 +22,33 @@ import com.project.BookStore.service.customerDetailService;
 public class customerDetailController {
 	
 	@Autowired
-	private userCredentialsRepo userRepo;
-	
-	@Autowired
 	private customerDetailService service;
 	
-	@PostMapping("/addcustomer")
+	@PostMapping("/admin/addcustomer")
 	public  ResponseEntity<responseStructure<CustomerDetailDTO>> addCustomer(@RequestBody customer customer) {
 		System.out.println("in controller"+customer);
 		return service.addCustomer(customer);
 	}
 	
 	
-	@GetMapping("/viewallcustomers")
-	public ResponseEntity<responseStructure<List<customer>>> viewAllCustomers() {
+	@GetMapping("/admin/viewallcustomers")
+	public ResponseEntity<responseStructure<List<CustomerDetailDTO>>> viewAllCustomers() {
 		return service.viewAllCustomers();
 	}
 	
 	
-	@GetMapping("/viewcustomer/{id}")
+	@GetMapping("/admin/viewcustomer/{id}")
 	public ResponseEntity<responseStructure<CustomerDetailDTO>> viewById(@PathVariable int id) {
 			return service.viewCustomerById(id);
 	}
 	
 	@GetMapping("/viewcurrentcustomer")
 	public ResponseEntity<responseStructure<CustomerDetailDTO>> viewCustomer() {
-		int Id = userRepo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
-			return service.viewCustomerById(Id);
+			return service.viewCurrentCustomer();
 	}
 	
 	@GetMapping("/admin/viewcustomerbyname/{name}")
-	public  ResponseEntity<responseStructure<List<customer>>> viewByName(@PathVariable String name) {
+	public  ResponseEntity<responseStructure<List<CustomerDetailDTO>>> viewByName(@PathVariable String name) {
 		return service.viewCustomerByName(name);
 	}
 	
@@ -64,7 +58,7 @@ public class customerDetailController {
 		return service.updateCustomerDetailAdmin(customer, id);
 	}
 	
-	@PutMapping("/updatecustomer")
+	@PutMapping("/updatecurrentcustomer")
 	public  ResponseEntity<responseStructure<CustomerDetailDTO>> upadteCustomer(@RequestBody customer customer) {
 		return service.updateCustomerDetail(customer);
 	}
@@ -81,7 +75,7 @@ public class customerDetailController {
 	}
 	
 	@DeleteMapping("/admin/deletecustomerbyname/{name}")
-	public  ResponseEntity<responseStructure<List<customer>>> deleteCustomerByname(@PathVariable String name) {
+	public  ResponseEntity<responseStructure<List<CustomerDetailDTO>>> deleteCustomerByname(@PathVariable String name) {
 		return service.deleteCustomerByName(name);
 	}
 			
