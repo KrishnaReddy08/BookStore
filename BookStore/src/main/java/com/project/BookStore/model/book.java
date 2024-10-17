@@ -26,6 +26,9 @@ public class book {
 	@Column(nullable = false)
 	private Float price;
 	
+	@Column(nullable = false)
+	private int quantity;
+	
 	@JsonBackReference
 	@OneToMany(mappedBy = "book", cascade = {CascadeType.DETACH,
 											CascadeType.MERGE,
@@ -71,11 +74,12 @@ public class book {
 	public void setOrderdetails(List<orderDetails> orderdetails) {
 		this.orderdetails = orderdetails;
 	}
-
-	@Override
-	public String toString() {
-		return "book [bookId=" + bookId + ", title=" + title + ", author=" + author + ", price=" + price + "]";
+	public int getQuantity() {
+		return quantity;
 	}
-	
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
 	
 }

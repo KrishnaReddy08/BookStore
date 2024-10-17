@@ -82,6 +82,10 @@ public class bookDetailService {
 		Optional<book> OptionalBook = repo.findById(id);
 		if(OptionalBook.isPresent()) {
 			book Book = OptionalBook.get();
+			if(book.getAuthor()==null) book.setAuthor(Book.getAuthor());
+			if(book.getPrice()==0) book.setPrice(Book.getPrice());
+			if(book.getTitle()==null) book.setTitle(Book.getTitle());
+			if(book.getQuantity()==0) book.setQuantity(Book.getQuantity());
 			Book.setBookId(id);
 			Book.setAuthor(book.getAuthor());
 			Book.setTitle(book.getTitle());

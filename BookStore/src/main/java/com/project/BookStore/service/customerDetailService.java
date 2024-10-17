@@ -3,6 +3,7 @@ package com.project.BookStore.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import com.project.BookStore.AuthenticatedUser.AuthenticatedUserDetails;
 import com.project.BookStore.DTO.CustomerDetailDTO;
 import com.project.BookStore.DTO.responseStructure;
 import com.project.BookStore.exception.CustomerNotFoundException;
+import com.project.BookStore.exception.InvalidPropertiesException;
+import com.project.BookStore.exception.InvalidRequestException;
 import com.project.BookStore.exception.UserNotFoundException;
 import com.project.BookStore.model.customer;
 import com.project.BookStore.model.userCredentials;
@@ -41,6 +44,12 @@ public class customerDetailService{
 		return DTO;
 	}
 	
+	private boolean isValidEmail(String email) {
+	    String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,7}$";
+	    Pattern pat = Pattern.compile(emailRegex);
+	    return pat.matcher(email).matches();
+	}
+	
 	public List<CustomerDetailDTO> convertToCustomerDetailTOList(List<customer> Customers) {
 	    return Customers.stream()
 	                 .map(this::CustomerDTOConvertor)
@@ -51,8 +60,10 @@ public class customerDetailService{
 	public ResponseEntity<responseStructure<CustomerDetailDTO>> addCustomer(customer customer){	
 		responseStructure<CustomerDetailDTO> structure = new responseStructure<CustomerDetailDTO>();
 		Optional<userCredentials> UserCred = credentialsRepo.findById(customer.getCustomerId());
+		if(repo.existsById(customer.getCustomerId())) throw new InvalidRequestException("Customer With Id "+customer.getCustomerId()+" Already Exists");
 		if(UserCred.isEmpty()) throw new UserNotFoundException("No User With Id "+customer.getCustomerId()+" Exists");
 		customer Customer = new customer();
+		if(isValidEmail(customer.getEmail())==false) throw new InvalidPropertiesException("Enter Valid Email");
 		UserCred.get().setCustomer(Customer);
 		Customer.setUserCredentials(UserCred.get());
 		Customer.setCustomerId(customer.getCustomerId());
@@ -123,6 +134,9 @@ public class customerDetailService{
 		Optional<customer> OptionalCustomer = repo.findById(id);
 		if(OptionalCustomer.isPresent()) {
 			customer Customer = OptionalCustomer.get();
+			if(customer.getName()==null) customer.setName(Customer.getName());
+			if(customer.getEmail()==null) customer.setEmail(Customer.getEmail());
+			if(isValidEmail(customer.getEmail())==false) throw new InvalidPropertiesException("Enter Valid Email");
 			Customer.setName(customer.getName());
 			Customer.setEmail(customer.getEmail());
 			structure.setData(CustomerDTOConvertor(repo.save(Customer)));
@@ -139,6 +153,9 @@ public class customerDetailService{
 		Optional<customer> OptionalCustomer = repo.findById(id);
 		if(OptionalCustomer.isPresent()) {
 			customer Customer = OptionalCustomer.get();
+			if(customer.getName()==null) customer.setName(Customer.getName());
+			if(customer.getEmail()==null) customer.setEmail(Customer.getEmail());
+			if(isValidEmail(customer.getEmail())==false) throw new InvalidPropertiesException("Enter Valid Email");
 			Customer.setName(customer.getName());
 			Customer.setEmail(customer.getEmail());
 			structure.setData(CustomerDTOConvertor(repo.save(Customer)));

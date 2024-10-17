@@ -63,10 +63,14 @@ public class orderDetailService {
 		Optional<book> OptionalBook = bookRepo.findById(order.getBookId());
 		if(OptionalBook.isEmpty()) throw new BookNotFoundException("Unable To Place Order With Book Id "+order.getBookId()+" Cause Book With Specified Id Not Found");
 		if(OptionalCustomer.isEmpty()) throw new CustomerNotFoundException("Unable To Place Order With Customer Id "+order.getCustomerId()+" Cause Customer With Specified Id Not Found");
-		
 		orderDetails UpdatedOrder = new orderDetails();
 		UpdatedOrder.setOrderId(order.getOrderId());
 		UpdatedOrder.setQuantity(order.getQuantity());
+		if(OptionalBook.get().getQuantity()<order.getQuantity()) {
+			throw new BookNotFoundException("Book With Specified Quantity "+order.getQuantity()+" Not Available Currently.Available Quantity Is "+OptionalBook.get().getQuantity());
+		}
+		OptionalBook.get().setQuantity(OptionalBook.get().getQuantity()-order.getQuantity());
+		bookRepo.save(OptionalBook.get());
 		UpdatedOrder.setBook(OptionalBook.get());
 		UpdatedOrder.setCustomer(OptionalCustomer.get());
 		structure.setData(OrderDTOConverter(repo.save(UpdatedOrder)));
@@ -83,6 +87,11 @@ public class orderDetailService {
 		if(OptionalBook.isEmpty()) throw new BookNotFoundException("Unable To Place Order With Book Id "+order.getBookId()+" Cause Book With Specified Id Not Found");
 		if(OptionalCustomer.isEmpty()) throw new CustomerNotFoundException("Unable To Place Order With Customer Id "+id+" Cause Customer Details With Specified Id Not Found");
 		orderDetails UpdatedOrder = new orderDetails();
+		if(OptionalBook.get().getQuantity()<order.getQuantity()) {
+			throw new BookNotFoundException("Book With Specified Quantity "+order.getQuantity()+" Not Available Currently.Available Quantity Is "+OptionalBook.get().getQuantity());
+		}
+		OptionalBook.get().setQuantity(OptionalBook.get().getQuantity()-order.getQuantity());
+		bookRepo.save(OptionalBook.get());
 		UpdatedOrder.setOrderId(order.getOrderId());
 		UpdatedOrder.setQuantity(order.getQuantity());
 		UpdatedOrder.setBook(OptionalBook.get());
@@ -150,10 +159,21 @@ public class orderDetailService {
 		Optional<orderDetails> OptionalOrder = repo.findById(Id);
 		if(OptionalOrder.isPresent()) {
 			orderDetails Order = OptionalOrder.get();
+			if(order.getCustomerId()==0) order.setCustomerId(OptionalOrder.get().getCustomer().getCustomerId());
+			if(order.getBookId()==0) order.setBookId(OptionalOrder.get().getBook().getBookId());
+	        if(order.getQuantity()==0) order.setQuantity(OptionalOrder.get().getQuantity());
 			Optional<customer> OptionalCustomer = customerRepo.findById(order.getCustomerId());
 			if (OptionalCustomer.isEmpty()) throw new CustomerNotFoundException("Unable To Update.Cause Customer With Id"+order.getCustomerId()+"Not Found");
 			Optional<book> OptionalBook = bookRepo.findById(order.getBookId());
+			
 			if (OptionalBook.isEmpty()) throw new CustomerNotFoundException("Unable To Update.Cause Book With Id"+order.getBookId()+"Not Found");
+			if((OptionalBook.get().getQuantity()+OptionalOrder.get().getQuantity())<order.getQuantity()) {
+				throw new BookNotFoundException("Book With Specified Quantity "+order.getQuantity()+" Not Available Currently.Available Quantity Is "+(OptionalBook.get().getQuantity()+OptionalOrder.get().getQuantity()));
+			}
+			if(order.getQuantity()>OptionalOrder.get().getQuantity()) OptionalBook.get().setQuantity((OptionalBook.get().getQuantity()+OptionalOrder.get().getQuantity())-(order.getQuantity()));
+			if(order.getQuantity()<OptionalOrder.get().getQuantity()) OptionalBook.get().setQuantity(OptionalBook.get().getQuantity()+(OptionalOrder.get().getQuantity()-order.getQuantity()));
+
+			bookRepo.save(OptionalBook.get());
 			Order.setOrderId(Id);
 			Order.setQuantity(order.getQuantity());
 		    Order.setBook(OptionalBook.get());
@@ -172,9 +192,18 @@ public class orderDetailService {
 		int CurrentUserId =credentials.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
 		if(OptionalOrder.isPresent()) {
 	        orderDetails Order = OptionalOrder.get();
+	        if(order.getBookId()==0) order.setBookId(OptionalOrder.get().getBook().getBookId());
+	        if(order.getQuantity()==0) order.setQuantity(OptionalOrder.get().getQuantity());
 			if(Order.getCustomer().getCustomerId()!=CurrentUserId) throw new OrderNotFoundException("You Have No Order With OrderId "+Id);
 			Optional<book> OptionalBook = bookRepo.findById(order.getBookId());
 			if (OptionalBook.isEmpty()) throw new CustomerNotFoundException("Unable To Update.Cause Book With Id"+order.getBookId()+"Not Found");
+			if((OptionalBook.get().getQuantity()+OptionalOrder.get().getQuantity())<order.getQuantity()) {
+				throw new BookNotFoundException("Book With Specified Quantity "+order.getQuantity()+" Not Available Currently.Available Quantity Is "+(OptionalBook.get().getQuantity()+OptionalOrder.get().getQuantity()));
+			}
+			if(order.getQuantity()>OptionalOrder.get().getQuantity()) OptionalBook.get().setQuantity((OptionalBook.get().getQuantity()+OptionalOrder.get().getQuantity())-(order.getQuantity()));
+			if(order.getQuantity()<OptionalOrder.get().getQuantity()) OptionalBook.get().setQuantity(OptionalBook.get().getQuantity()+(OptionalOrder.get().getQuantity()-order.getQuantity()));
+			
+			bookRepo.save(OptionalBook.get());
 			Order.setOrderId(Id);
 			Order.setQuantity(order.getQuantity());
 		    Order.setBook(OptionalBook.get());

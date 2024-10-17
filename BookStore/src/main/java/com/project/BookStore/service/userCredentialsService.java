@@ -65,8 +65,10 @@ public class userCredentialsService implements UserDetailsService {
 		responseStructure<userCredentials> structure = new responseStructure<userCredentials>();
 		Optional<userCredentials> optionalCredentials = repo.findById(Id);
 		if(optionalCredentials.isPresent()) {
-			userCredentials Credentials = new userCredentials();
-			if(credentials.getRoles()==null) credentials.setRoles(optionalCredentials.get().getRoles());
+			userCredentials Credentials = optionalCredentials.get();
+			if(credentials.getRoles()==null) credentials.setRoles(Credentials.getRoles());
+			if(credentials.getPassword()==null) credentials.setPassword(Credentials.getPassword());
+			if(credentials.getUsername()==null) credentials.setUsername(Credentials.getUsername());
 			Credentials.setCustomerId(Id);
 			Credentials.setUsername(credentials.getUsername());
 			Credentials.setPassword(credentials.getPassword());
@@ -85,7 +87,9 @@ public class userCredentialsService implements UserDetailsService {
 		int id = repo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
 		Optional<userCredentials> optionalCredentials = repo.findById(id);
 		if(optionalCredentials.isPresent()) {
-			userCredentials Credentials = new userCredentials(); 
+			userCredentials Credentials = optionalCredentials.get();
+			if(credentials.getPassword()==null) credentials.setPassword(Credentials.getPassword());
+			if(credentials.getUsername()==null) credentials.setUsername(Credentials.getUsername());
 			Credentials.setRoles(optionalCredentials.get().getRoles());
 			Credentials.setCustomerId(id);
 			Credentials.setUsername(credentials.getUsername());
