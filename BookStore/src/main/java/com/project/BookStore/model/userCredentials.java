@@ -2,6 +2,7 @@ package com.project.BookStore.model;
 
 import java.util.Set;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -57,7 +58,8 @@ public class userCredentials {
 		return password;
 	}
 	public void setPassword(String password) {
-		this.password = password;
+		String EncryptedPassword = new BCryptPasswordEncoder(10).encode(password);
+		this.password = EncryptedPassword;
 	}
 	public int getCustomerId() {
 		return customerId;
