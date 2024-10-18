@@ -1,12 +1,16 @@
 package com.project.BookStore.service;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.BookStore.AuthenticatedUser.AuthenticatedUserDetails;
@@ -14,6 +18,7 @@ import com.project.BookStore.DTO.responseStructure;
 import com.project.BookStore.config.userDetailConfig;
 import com.project.BookStore.exception.InvalidRequestException;
 import com.project.BookStore.exception.UserNotFoundException;
+import com.project.BookStore.model.Role;
 import com.project.BookStore.model.userCredentials;
 import com.project.BookStore.repository.userCredentialsRepo;
 
@@ -31,6 +36,20 @@ public class userCredentialsService implements UserDetailsService {
 			return new userDetailConfig(credentials.get());
 		}throw new UserNotFoundException("USER NOT FOUND");
 	}
+	
+
+	   @Bean
+	   CommandLineRunner initAdminUser() {
+	       return args -> {
+	           if (repo.findByUsername("admin").isEmpty()) {
+	               userCredentials admin = new userCredentials();
+	               admin.setUsername("admin");
+	               admin.setPassword("adminpassword");
+	               admin.setRoles(Set.of(Role.ADMIN));
+	               repo.save(admin);
+	           }
+	       };
+	   }
 	
 	public ResponseEntity<responseStructure<userCredentials>> viewUserAdmin(int Id){
 		responseStructure<userCredentials> structure = new responseStructure<userCredentials>();
