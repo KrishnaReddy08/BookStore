@@ -27,7 +27,6 @@ public class bookDetailController {
 	
 	@PostMapping("/admin/addbook")
 	public ResponseEntity<responseStructure<book>> addBook(@RequestBody book book) {
-		System.out.println(repo.existsByTitle(book.getTitle()));
 		return service.addBook(book);
 	}
 	

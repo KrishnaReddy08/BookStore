@@ -67,10 +67,4 @@ public class customer {
 	public void setOrderdetails(List<orderDetails> orderdetails) {
 		this.orderdetails = orderdetails;
 	}
-	@Override
-	public String toString() {
-		return "customer [customerId=" + customerId + ", userCredentials=" + userCredentials + ", name=" + name
-				+ ", email=" + email + ", orderdetails=" + orderdetails + "]";
-	}
-	
 }
