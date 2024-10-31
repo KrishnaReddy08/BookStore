@@ -45,8 +45,8 @@ public class bookDetailService {
 		if(books.isEmpty()) throw new BookNotFoundException("No Book Found");
 		structure.setData(books);
 		structure.setMessage("Books Found");
-		structure.setStatus_code(HttpStatus.FOUND.value());
-		return new ResponseEntity<responseStructure<List<book>>>(structure,HttpStatus.FOUND);	
+		structure.setStatus_code(HttpStatus.OK.value());
+		return new ResponseEntity<responseStructure<List<book>>>(structure,HttpStatus.OK);
 	}
 
 	
@@ -57,8 +57,8 @@ public class bookDetailService {
 			book Book = OptionalBook.get();
 			structure.setData(Book);
 			structure.setMessage("Book Found");
-			structure.setStatus_code(HttpStatus.FOUND.value());
-			return new ResponseEntity<responseStructure<book>>(structure,HttpStatus.FOUND);
+			structure.setStatus_code(HttpStatus.OK.value());
+			return new ResponseEntity<responseStructure<book>>(structure,HttpStatus.OK);
 		}throw new BookNotFoundException("Book With Id "+id+" Not Found");
 	}
 
@@ -70,8 +70,8 @@ public class bookDetailService {
 				book Book = OptionalBook.get();
 				structure.setData(Book);
 				structure.setMessage("Book Found");
-				structure.setStatus_code(HttpStatus.FOUND.value());
-				return new ResponseEntity<responseStructure<book>>(structure,HttpStatus.FOUND);
+				structure.setStatus_code(HttpStatus.OK.value());
+				return new ResponseEntity<responseStructure<book>>(structure,HttpStatus.OK);
 			}throw new BookNotFoundException("Book With Title "+title+" Not Found");
 	}
 
@@ -101,17 +101,14 @@ public class bookDetailService {
 	@Transactional
 	public ResponseEntity<responseStructure<book>> deleteBookById(int id) {
 		responseStructure<book> structure = new responseStructure<book>();
-		if(OrderRepo.existsById(id)) throw new DataIntegrityViolationException("Unable To Delete Parent");
-		System.out.println(OrderRepo.existsById(id));
-		
 		Optional<book> OptionalBook =repo.findById(id);
 		if(OptionalBook.isPresent()) {
 			book Book = OptionalBook.get();
 			repo.delete(Book);
 			structure.setData(Book);
 			structure.setMessage("Deleted Successfully");
-			structure.setStatus_code(HttpStatus.ACCEPTED.value());
-			return new ResponseEntity<responseStructure<book>>(structure,HttpStatus.ACCEPTED);	
+			structure.setStatus_code(HttpStatus.OK.value());
+			return new ResponseEntity<responseStructure<book>>(structure,HttpStatus.OK);
 		}throw new BookNotFoundException("Book With The Id "+id+" Not Found.Unable To Delete");
 	}
 	
@@ -120,15 +117,13 @@ public class bookDetailService {
 		responseStructure<book> structure = new responseStructure<book>();
 		Optional<book> OptionalBook =repo.findByTitle(title);
 		if(OptionalBook.isPresent()) {
-			if(OrderRepo.existsById(OptionalBook.get().getBookId())) throw new InvalidRequestException("Invalid Request.Cannot Delete A Parent Row");
 			book Book = OptionalBook.get();
 			repo.delete(Book);
 			structure.setData(Book);
 			structure.setMessage("Deleted Successfully");
-			structure.setStatus_code(HttpStatus.ACCEPTED.value());
-			return new ResponseEntity<responseStructure<book>>(structure,HttpStatus.ACCEPTED);	
+			structure.setStatus_code(HttpStatus.OK.value());
+			return new ResponseEntity<responseStructure<book>>(structure,HttpStatus.OK);
 		}throw new BookNotFoundException("Book With The Title "+title+" Not Found.Unable To Delete");
 	}
-	
-	
+
 }

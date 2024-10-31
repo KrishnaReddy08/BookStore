@@ -105,7 +105,6 @@ public class userCredentialsService implements UserDetailsService {
 		responseStructure<userCredentials> structure = new responseStructure<userCredentials>();
 		int id = repo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
 		Optional<userCredentials> optionalCredentials = repo.findById(id);
-		if(optionalCredentials.isPresent()) {
 			userCredentials Credentials = optionalCredentials.get();
 			if(credentials.getPassword()==null) credentials.setPassword(Credentials.getPassword());
 			if(credentials.getUsername()==null) credentials.setUsername(Credentials.getUsername());
@@ -117,8 +116,6 @@ public class userCredentialsService implements UserDetailsService {
 			structure.setMessage("User Credentials Updated");
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
 			return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.ACCEPTED);
-		}
-		throw new UserNotFoundException("Enter Existing And Valid User Credentials");
 	}
 	
 	public ResponseEntity<responseStructure<userCredentials>> deleteUser(int Id){
@@ -137,12 +134,10 @@ public class userCredentialsService implements UserDetailsService {
 		responseStructure<userCredentials> structure = new responseStructure<userCredentials>();
 		int Id = repo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
 		Optional<userCredentials> optionalCredentials = repo.findById(Id);
-		if(optionalCredentials.isPresent()) {
 			repo.deleteById(Id);
 			structure.setData(optionalCredentials.get());
 			structure.setMessage("User Deleted");
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
 			return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.ACCEPTED);
-		}throw new UserNotFoundException("Enter Existing And Valid User Credentials");
 	}
 }

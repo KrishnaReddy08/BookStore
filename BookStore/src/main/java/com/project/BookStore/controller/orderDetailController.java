@@ -54,7 +54,7 @@ public class orderDetailController {
 	
 
 	@GetMapping("/viewallorders")
-	public ResponseEntity<responseStructure<List<orderDetails>>> viewAllOrders(){
+	public ResponseEntity<responseStructure<List<OrderDetailDTO>>> viewAllOrders(){
 		return service.viewAllOrders();
 	}
 

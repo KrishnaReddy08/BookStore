@@ -27,7 +27,6 @@ import jakarta.transaction.Transactional;
 
 
 @Service
-
 public class customerDetailService{
 	
 	@Autowired
@@ -44,7 +43,7 @@ public class customerDetailService{
 		return DTO;
 	}
 	
-	private boolean isValidEmail(String email) {
+	public boolean isValidEmail(String email) {
 	    String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,7}$";
 	    Pattern pat = Pattern.compile(emailRegex);
 	    return pat.matcher(email).matches();
@@ -63,14 +62,13 @@ public class customerDetailService{
 		if(repo.existsById(customer.getCustomerId())) throw new InvalidRequestException("Customer With Id "+customer.getCustomerId()+" Already Exists");
 		if(UserCred.isEmpty()) throw new UserNotFoundException("No User With Id "+customer.getCustomerId()+" Exists");
 		customer Customer = new customer();
-		if(isValidEmail(customer.getEmail())==false) throw new InvalidPropertiesException("Enter Valid Email");
+		if(!isValidEmail(customer.getEmail())) throw new InvalidPropertiesException("Enter Valid Email");
 		UserCred.get().setCustomer(Customer);
 		Customer.setUserCredentials(UserCred.get());
 		Customer.setCustomerId(customer.getCustomerId());
 		Customer.setEmail(customer.getEmail());
 		Customer.setName(customer.getName());
 		credentialsRepo.save(UserCred.get());
-		System.out.println("after adding usercred"+Customer);
 		structure.setData(CustomerDTOConvertor(repo.save(Customer)));
 		structure.setMessage("Added Successfully");
 		structure.setStatus_code(HttpStatus.ACCEPTED.value());
@@ -84,8 +82,8 @@ public class customerDetailService{
 		if(customers.isEmpty()) throw new CustomerNotFoundException("No Customer Found");
 		structure.setData(convertToCustomerDetailTOList(customers));
 		structure.setMessage("Customers Found");
-		structure.setStatus_code(HttpStatus.FOUND.value());
-		return new ResponseEntity<responseStructure<List<CustomerDetailDTO>>>(structure,HttpStatus.FOUND);	
+		structure.setStatus_code(HttpStatus.OK.value());
+		return new ResponseEntity<responseStructure<List<CustomerDetailDTO>>>(structure,HttpStatus.OK);
 	}
 	
 	
@@ -95,7 +93,7 @@ public class customerDetailService{
 		if(customer.isPresent()) {
 			structure.setData(CustomerDTOConvertor(customer.get()));
 			structure.setMessage("Customer Found");
-			structure.setStatus_code(HttpStatus.FOUND.value());
+			structure.setStatus_code(HttpStatus.OK.value());
 			return new ResponseEntity<responseStructure<CustomerDetailDTO>>(structure,HttpStatus.OK);
 		}
 		throw new CustomerNotFoundException("Customer With Id "+id+" Not Found");
@@ -109,7 +107,7 @@ public class customerDetailService{
 		if(customer.isPresent()) {
 			structure.setData(CustomerDTOConvertor(customer.get()));
 			structure.setMessage("Customer Found");
-			structure.setStatus_code(HttpStatus.FOUND.value());
+			structure.setStatus_code(HttpStatus.OK.value());
 			return new ResponseEntity<responseStructure<CustomerDetailDTO>>(structure,HttpStatus.OK);
 		}
 		throw new CustomerNotFoundException("Customer With Id "+id+" Not Found");
@@ -119,12 +117,10 @@ public class customerDetailService{
 	public ResponseEntity<responseStructure<List<CustomerDetailDTO>>> viewCustomerByName(String name) {
 		List<customer> customer = repo.findByName(name).get();
 		responseStructure<List<CustomerDetailDTO>> structure = new responseStructure<List<CustomerDetailDTO>>();
-		if(customer.isEmpty()) {
-			throw new CustomerNotFoundException("Customer With Name "+name+" Not Found");
-		}
+		if(customer.isEmpty()) throw new CustomerNotFoundException("Customer With Name "+name+" Not Found");
 		structure.setData(convertToCustomerDetailTOList(customer));
 		structure.setMessage("Customers Found");
-		structure.setStatus_code(HttpStatus.FOUND.value());
+		structure.setStatus_code(HttpStatus.OK.value());
 		return new ResponseEntity<responseStructure<List<CustomerDetailDTO>>>(structure,HttpStatus.OK);
 	}
 	
@@ -136,7 +132,7 @@ public class customerDetailService{
 			customer Customer = OptionalCustomer.get();
 			if(customer.getName()==null) customer.setName(Customer.getName());
 			if(customer.getEmail()==null) customer.setEmail(Customer.getEmail());
-			if(isValidEmail(customer.getEmail())==false) throw new InvalidPropertiesException("Enter Valid Email");
+			if(!isValidEmail(customer.getEmail())) throw new InvalidPropertiesException("Enter Valid Email");
 			Customer.setName(customer.getName());
 			Customer.setEmail(customer.getEmail());
 			structure.setData(CustomerDTOConvertor(repo.save(Customer)));
@@ -177,7 +173,7 @@ public class customerDetailService{
 			credentialsRepo.save(Credentials.get());
 			repo.deleteById(id);
 			structure.setData(CustomerDTOConvertor(Customer));
-			structure.setMessage("Deleted Sucessfully");
+			structure.setMessage("Deleted Successfully");
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
 			return new ResponseEntity<responseStructure<CustomerDetailDTO>>(structure,HttpStatus.ACCEPTED);
 		}
@@ -195,7 +191,7 @@ public class customerDetailService{
 			credentialsRepo.save(Credentials.get());
 			repo.deleteById(id);
 			structure.setData(CustomerDTOConvertor(Customer));
-			structure.setMessage("Deleted Sucessfully");
+			structure.setMessage("Deleted Successfully");
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
 			return new ResponseEntity<responseStructure<CustomerDetailDTO>>(structure,HttpStatus.ACCEPTED);
 		}
@@ -210,7 +206,7 @@ public class customerDetailService{
 			List<customer> customer = OptionalCustomer.get();
 			repo.deleteAllInBatch(customer);
 			structure.setData(convertToCustomerDetailTOList(customer));
-			structure.setMessage("Deleted Sucessfully");
+			structure.setMessage("Deleted Successfully");
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
 			return new ResponseEntity<responseStructure<List<CustomerDetailDTO>>>(structure,HttpStatus.ACCEPTED);
 		}
