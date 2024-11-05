@@ -11,6 +11,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.project.BookStore.DTO.responseStructure;
 
+import java.security.SignatureException;
+
 @ControllerAdvice
 public class projectExceptionHandler extends ResponseEntityExceptionHandler  {
 	
@@ -94,5 +96,15 @@ public class projectExceptionHandler extends ResponseEntityExceptionHandler  {
 		structure.setStatus_code(HttpStatus.BAD_REQUEST.value());
 		return new ResponseEntity<responseStructure<String>>(structure,HttpStatus.BAD_REQUEST);
 		}
+
+	@ExceptionHandler(InvalidJwtTokenSignatureException.class)
+	public ResponseEntity<responseStructure<String>> handleSignatureException(InvalidJwtTokenSignatureException exception){
+		responseStructure<String> structure = new responseStructure<>();
+		System.err.println("JWT SignatureException caught: " + exception.getMessage());
+		structure.setData("INVALID TOKEN ");
+		structure.setMessage(exception.getMessage());
+		structure.setStatus_code(HttpStatus.FORBIDDEN.value());
+		return new ResponseEntity<responseStructure<String>>(structure,HttpStatus.FORBIDDEN);
+	}
 	
 }

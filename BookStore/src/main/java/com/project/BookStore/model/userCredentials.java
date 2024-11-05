@@ -58,8 +58,7 @@ public class userCredentials {
 		return password;
 	}
 	public void setPassword(String password) {
-		String EncryptedPassword = new BCryptPasswordEncoder(10).encode(password);
-		this.password = EncryptedPassword;
+		this.password = password;
 	}
 	public int getCustomerId() {
 		return customerId;

@@ -1,13 +1,16 @@
 package com.project.BookStore.service;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
+import com.project.BookStore.JWT.jwtservice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,19 +27,19 @@ import com.project.BookStore.repository.userCredentialsRepo;
 
 
 @Service
-public class userCredentialsService implements UserDetailsService {
-	
+public class userCredentialsService {
+
 	@Autowired
 	private userCredentialsRepo repo;
-	
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
-		Optional<userCredentials> credentials = repo.findByUsername(username);
-		if(credentials.isPresent()) {
-			return new userDetailConfig(credentials.get());
-		}throw new UserNotFoundException("USER NOT FOUND");
-	}
-	
+
+	@Autowired
+	private AuthenticationManager authmanager;
+
+	@Autowired
+	private jwtservice jwtservice;
+
+
+	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
 
 	   @Bean
 	   CommandLineRunner initAdminUser() {
@@ -44,7 +47,7 @@ public class userCredentialsService implements UserDetailsService {
 	           if (repo.findByUsername("admin").isEmpty()) {
 	               userCredentials admin = new userCredentials();
 	               admin.setUsername("admin");
-	               admin.setPassword("adminpassword");
+	               admin.setPassword(encoder.encode("adminpassword"));
 	               admin.setRoles(Set.of(Role.ADMIN));
 	               repo.save(admin);
 	           }
@@ -74,6 +77,7 @@ public class userCredentialsService implements UserDetailsService {
 	public ResponseEntity<responseStructure<userCredentials>> addNewUser(userCredentials credentials){
 		responseStructure<userCredentials> structure = new responseStructure<userCredentials>();
 		if(repo.existsById(credentials.getCustomerId())) throw new InvalidRequestException("User With Id "+credentials.getCustomerId()+" Already Exists");
+		credentials.setPassword(encoder.encode(credentials.getPassword()));
 		structure.setData(repo.save(credentials));
 		structure.setMessage("Added User");
 		structure.setStatus_code(HttpStatus.ACCEPTED.value());
@@ -86,7 +90,14 @@ public class userCredentialsService implements UserDetailsService {
 		if(optionalCredentials.isPresent()) {
 			userCredentials Credentials = optionalCredentials.get();
 			if(credentials.getRoles()==null) credentials.setRoles(Credentials.getRoles());
-			if(credentials.getPassword()==null) credentials.setPassword(Credentials.getPassword());
+
+
+			if(credentials.getPassword()==null)
+				credentials.setPassword(Credentials.getPassword());
+			else
+				credentials.setPassword(encoder.encode(credentials.getPassword()));
+
+
 			if(credentials.getUsername()==null) credentials.setUsername(Credentials.getUsername());
 			Credentials.setCustomerId(Id);
 			Credentials.setUsername(credentials.getUsername());
@@ -106,7 +117,14 @@ public class userCredentialsService implements UserDetailsService {
 		int id = repo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
 		Optional<userCredentials> optionalCredentials = repo.findById(id);
 			userCredentials Credentials = optionalCredentials.get();
-			if(credentials.getPassword()==null) credentials.setPassword(Credentials.getPassword());
+
+
+			if(credentials.getPassword()==null)
+				credentials.setPassword(Credentials.getPassword());
+			else
+				credentials.setPassword(encoder.encode(credentials.getPassword()));
+
+
 			if(credentials.getUsername()==null) credentials.setUsername(Credentials.getUsername());
 			Credentials.setRoles(optionalCredentials.get().getRoles());
 			Credentials.setCustomerId(id);
@@ -139,5 +157,31 @@ public class userCredentialsService implements UserDetailsService {
 			structure.setMessage("User Deleted");
 			structure.setStatus_code(HttpStatus.ACCEPTED.value());
 			return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.ACCEPTED);
+	}
+
+    public ResponseEntity<responseStructure<String>> verify(userCredentials user) {
+		responseStructure<String> structure = new responseStructure<>();
+		Authentication authentication = authmanager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword()));
+		Map<String,Object> claims = new HashMap<>();
+		String token;
+		if(authentication.isAuthenticated()) {
+			token = jwtservice.generateToken(user.getUsername());
+			structure.setData(token);
+			structure.setMessage("success");
+			return new ResponseEntity<responseStructure<String>>(structure, HttpStatus.OK);
+		}
+		else
+			structure.setData("failed");
+		return new ResponseEntity<responseStructure<String>>(structure,HttpStatus.OK);
+    }
+
+	public ResponseEntity<responseStructure<List<userCredentials>>> viewAllUsers() {
+		   responseStructure<List<userCredentials>> structure = new responseStructure<>();
+		   List<userCredentials> credentials = repo.findAll();
+		   if (credentials.isEmpty()) throw new UserNotFoundException("No Users Found");
+		   structure.setMessage("Users Found");
+		   structure.setData(credentials);
+		   structure.setStatus_code(HttpStatus.OK.value());
+		   return new ResponseEntity<responseStructure<List<userCredentials>>>(structure,HttpStatus.OK);
 	}
 }

@@ -2,6 +2,7 @@ package com.project.BookStore.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,13 +15,20 @@ import com.project.BookStore.DTO.responseStructure;
 import com.project.BookStore.model.userCredentials;
 import com.project.BookStore.service.userCredentialsService;
 
+import java.util.List;
+
 
 @RestController
 public class userCredentialsController {
 	
 	@Autowired
 	private userCredentialsService service;
-	
+
+	@GetMapping("/admin/viewallusers")
+	public ResponseEntity<responseStructure<List<userCredentials>>> ViewAllUsers(){
+		return service.viewAllUsers();
+	}
+
 	@GetMapping("/admin/viewuser/{Id}")
 	public ResponseEntity<responseStructure<userCredentials>> ViewUserAdmin(@PathVariable int Id){
 		return service.viewUserAdmin(Id);
@@ -29,6 +37,11 @@ public class userCredentialsController {
 	@GetMapping("/viewcurrentuser")
 	public ResponseEntity<responseStructure<userCredentials>> ViewCurrentUser(){
 		return service.viewCurrentUser();
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<responseStructure<String>> login(@RequestBody userCredentials user){
+		return service.verify(user);
 	}
 	
 	@PostMapping("/admin/addnewuser")
