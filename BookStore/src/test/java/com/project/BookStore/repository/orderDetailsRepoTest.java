@@ -7,13 +7,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Transactional
 @DataJpaTest
 public class orderDetailsRepoTest {
     @Autowired
@@ -43,10 +42,8 @@ public class orderDetailsRepoTest {
         customer.setName("name");
         customer.setEmail("krishna@gmail.com");
         customer.setCustomerId(4);
-        customer.setUserCredentials(credentials);
-        credentials.setCustomer(customer);
-        credentialsRepo.save(credentials);
-        customerRepo.save(customer);
+
+
 
         book = new book();
         book.setBookId(1);

@@ -172,7 +172,7 @@ public class userCredentialsService {
 		}
 		else
 			structure.setData("failed");
-		return new ResponseEntity<responseStructure<String>>(structure,HttpStatus.OK);
+		return new ResponseEntity<responseStructure<String>>(structure,HttpStatus.FORBIDDEN);
     }
 
 	public ResponseEntity<responseStructure<List<userCredentials>>> viewAllUsers() {

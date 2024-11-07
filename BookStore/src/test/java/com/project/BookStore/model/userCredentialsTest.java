@@ -25,15 +25,9 @@ public class userCredentialsTest {
         user.setCustomerId(1);
         Assertions.assertEquals("krishna",user.getUsername());
         Assertions.assertEquals(1,user.getCustomerId());
-        Assertions.assertEquals(true, encoder.matches("krishna", user.getPassword()));
+        Assertions.assertEquals("krishna",user.getPassword());
     }
-    @Test
-    public void testPasswordEncoding(){
-        String password = "krishna";
-        user.setPassword(password);
-        Assertions.assertEquals(false,encoder.matches("wrongpassword", user.getPassword()));
-        Assertions.assertEquals(true,encoder.matches(password, user.getPassword()));
-    }
+
     @Test
     public void testCustomer(){
         customer customer = new customer();

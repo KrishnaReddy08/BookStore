@@ -50,7 +50,7 @@ public class userCredentialsController {
 	}
 	
 	@PutMapping("/admin/updateuser/{Id}")
-	public ResponseEntity<responseStructure<userCredentials>> UpdateUser(@PathVariable int Id,@RequestBody userCredentials credentials){
+	public ResponseEntity<responseStructure<userCredentials>> UpdateUserAdmin(@PathVariable int Id,@RequestBody userCredentials credentials){
 		return service.UpdateUser(Id, credentials);
 	}
 	

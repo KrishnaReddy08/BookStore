@@ -3,28 +3,22 @@ package com.project.BookStore.repository;
 import com.project.BookStore.model.Role;
 import com.project.BookStore.model.customer;
 import com.project.BookStore.model.userCredentials;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.metamodel.EntityType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Transactional
 @DataJpaTest
-public class customerRepoTest {
+public class CustomerRepoTest {
     @Autowired
-    private customerRepo repo;
+    private customerRepo customerRepo;
     private customer customer;
     @Autowired
     private  userCredentialsRepo credentialsRepo;
@@ -44,12 +38,12 @@ public class customerRepoTest {
         credentials.setUsername("username");
         credentials.setCustomer(customer);
         credentialsRepo.save(credentials);
-        repo.save(customer);
+        customerRepo.save(customer);
     }
 
     @AfterEach
     void tearDown() {
-        repo.deleteAll();
+        customerRepo.deleteAll();
         credentialsRepo.deleteAll();
         credentials=null;
         customer=null;
@@ -57,7 +51,7 @@ public class customerRepoTest {
 
     @Test
     public void TestFindByName(){
-        List<customer> cust = repo.findByName("name").get();
+        List<customer> cust = customerRepo.findByName("name").get();
         Assertions.assertEquals("name123@gmail.com",cust.get(0).getEmail());
     }
 
