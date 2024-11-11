@@ -30,10 +30,7 @@ public class book {
 	private int quantity;
 	
 	@JsonBackReference
-	@OneToMany(mappedBy = "book", cascade = {CascadeType.DETACH,
-											CascadeType.MERGE,
-											CascadeType.PERSIST,
-											CascadeType.REFRESH})
+	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
 	private List<orderDetails> orderdetails;
 	
 	

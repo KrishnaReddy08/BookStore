@@ -20,6 +20,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,6 +37,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -50,9 +53,11 @@ class userCredentialsControllerTest {
     private userCredentialsRepo repo;
 
     @MockBean
-    private com.project.BookStore.JWT.jwtservice jwtservice;
+    private jwtservice jwtservice;
     @MockBean
     private UserService userService;
+
+
 
 
     private responseStructure<userCredentials> structure;
@@ -175,16 +180,4 @@ class userCredentialsControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    void login() throws Exception {
-        when(service.verify(any(userCredentials.class))).thenReturn(new ResponseEntity<responseStructure<String>>(new responseStructure<String>(),HttpStatus.OK));
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String stringUserCredentials = objectMapper.writeValueAsString(credentials);
-
-        mockMvc.perform(post("/login").with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(stringUserCredentials))
-                .andExpect(status().isOk());
-    }
 }

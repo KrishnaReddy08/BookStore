@@ -60,8 +60,8 @@ public class userCredentialsService {
 		if(credentials.isPresent()) {
 			structure.setData(repo.findById(Id).get());
 			structure.setMessage("USER FOUND");
-			structure.setStatus_code(HttpStatus.FOUND.value());
-			return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.FOUND);
+			structure.setStatus_code(HttpStatus.OK.value());
+			return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.OK);
 		}throw new UserNotFoundException("User With Id "+Id+" Not Found");
 	}
 	
@@ -70,8 +70,8 @@ public class userCredentialsService {
 		int Id =repo.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
 		structure.setData(repo.findById(Id).get());
 		structure.setMessage("USER FOUND");
-		structure.setStatus_code(HttpStatus.FOUND.value());
-		return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.FOUND);
+		structure.setStatus_code(HttpStatus.OK.value());
+		return new ResponseEntity<responseStructure<userCredentials>>(structure,HttpStatus.OK);
 	}
 	
 	public ResponseEntity<responseStructure<userCredentials>> addNewUser(userCredentials credentials){
@@ -171,7 +171,7 @@ public class userCredentialsService {
 			return new ResponseEntity<responseStructure<String>>(structure, HttpStatus.OK);
 		}
 		else
-			structure.setData("failed");
+			structure.setMessage("failed");
 		return new ResponseEntity<responseStructure<String>>(structure,HttpStatus.FORBIDDEN);
     }
 

@@ -50,11 +50,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     }
                 }
             } catch (InvalidJwtTokenSignatureException e) {
-                response.setStatus(HttpStatus.FORBIDDEN.value());
-                response.getWriter().write("INVALID TOKEN");
-                response.getWriter().flush();
-                response.getWriter().close();
-                return;
+                throw new InvalidJwtTokenSignatureException("INVALID JWT TOKEN SIGNATURE");
             }
 
         }

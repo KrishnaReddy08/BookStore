@@ -21,7 +21,7 @@ import java.util.function.Function;
 @Service
 public class jwtservice {
 
-    private String key;
+    protected String key;
 
     public jwtservice() throws NoSuchAlgorithmException {
         KeyGenerator keyG = KeyGenerator.getInstance("HmacSHA256");
@@ -36,7 +36,7 @@ public class jwtservice {
                 .add(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis()+1000*60*5))
+                .expiration(new Date(System.currentTimeMillis()+1000*60*60))
                 .and()
                 .signWith(keyGenerator())
                 .compact();
@@ -57,7 +57,7 @@ public class jwtservice {
         return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    private Claims extractsAllClaims(String Token){
+    Claims extractsAllClaims(String Token){
         try {
             return Jwts.parser()
                     .verifyWith(keyGenerator())
@@ -70,17 +70,17 @@ public class jwtservice {
         }
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
+    <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
         final Claims claims = extractsAllClaims(token);
         return claimResolver.apply(claims);
     }
 
-    private boolean isTokenExpired(String token) {
+    boolean isTokenExpired(String token) {
         boolean isexpired = extractExpiration(token).before(new Date());
         return isexpired;
     }
 
-    private Date extractExpiration(String token) {
+    Date extractExpiration(String token) {
         Date date = extractClaim(token, Claims::getExpiration);
         return date;
     }

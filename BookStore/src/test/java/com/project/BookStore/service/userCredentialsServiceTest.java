@@ -2,6 +2,7 @@ package com.project.BookStore.service;
 
 import com.project.BookStore.AuthenticatedUser.AuthenticatedUserDetails;
 import com.project.BookStore.DTO.responseStructure;
+import com.project.BookStore.JWT.jwtservice;
 import com.project.BookStore.exception.InvalidRequestException;
 import com.project.BookStore.exception.UserNotFoundException;
 import com.project.BookStore.model.Role;
@@ -14,10 +15,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -33,6 +38,12 @@ class userCredentialsServiceTest {
     @Mock
     private userCredentialsRepo repo;
     private customer customer;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private jwtservice jwtservice;
 
     @BeforeEach
     void setUp() {
@@ -64,7 +75,7 @@ class userCredentialsServiceTest {
         when(repo.findById(1)).thenReturn(Optional.of(credentials));
         ResponseEntity<responseStructure<userCredentials>> response = service.viewUserAdmin(1);
 
-        assertEquals(HttpStatus.FOUND,response.getStatusCode());
+        assertEquals(HttpStatus.OK,response.getStatusCode());
         assertEquals("USER FOUND",response.getBody().getMessage());
         assertEquals(credentials,response.getBody().getData());
 
@@ -80,7 +91,7 @@ class userCredentialsServiceTest {
         when(repo.findById(1)).thenReturn(Optional.of(credentials));
         ResponseEntity<responseStructure<userCredentials>> response = service.viewCurrentUser();
 
-        assertEquals(HttpStatus.FOUND,response.getStatusCode());
+        assertEquals(HttpStatus.OK,response.getStatusCode());
         assertEquals("USER FOUND",response.getBody().getMessage());
         assertEquals(credentials,response.getBody().getData());
     }
@@ -154,5 +165,35 @@ class userCredentialsServiceTest {
         assertEquals(HttpStatus.ACCEPTED,response.getStatusCode());
         assertEquals("User Deleted",response.getBody().getMessage());
         assertEquals(credentials,response.getBody().getData());
+    }
+
+    @Test
+    void viewAllUsers() {
+        when(repo.findAll()).thenReturn(java.util.List.of(credentials));
+        ResponseEntity<responseStructure<java.util.List<userCredentials>>> response = service.viewAllUsers();
+
+        assertEquals(HttpStatus.OK,response.getStatusCode());
+        assertEquals("Users Found",response.getBody().getMessage());
+        assertEquals(java.util.List.of(credentials),response.getBody().getData());
+
+        when(repo.findAll()).thenReturn(List.of());
+        assertThrows(UserNotFoundException.class,()->{
+            service.viewAllUsers();
+        });
+    }
+
+    @Test
+    void verify() {
+        when(repo.findByUsername(credentials.getUsername())).thenReturn(Optional.of(credentials));
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(new UsernamePasswordAuthenticationToken(credentials.getUsername(), credentials.getPassword()));
+
+        String Token = "metbmklmbpwih4jmhpom4bi4";
+        when(jwtservice.generateToken(credentials.getUsername())).thenReturn(Token);
+
+        ResponseEntity<responseStructure<String>> response = service.verify(credentials);
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals("failed", response.getBody().getMessage());
     }
 }
