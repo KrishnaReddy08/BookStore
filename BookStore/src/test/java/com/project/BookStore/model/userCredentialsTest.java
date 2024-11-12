@@ -3,19 +3,16 @@ package com.project.BookStore.model;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class userCredentialsTest {
     private userCredentials user;
-    private BCryptPasswordEncoder encoder;
 
     @BeforeEach
     public void beforeAll() {
         user = new userCredentials();
-        encoder = new BCryptPasswordEncoder(10);
     }
 
     @Test

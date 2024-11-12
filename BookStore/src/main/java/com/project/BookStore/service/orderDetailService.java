@@ -1,6 +1,5 @@
 package com.project.BookStore.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -75,8 +74,6 @@ public class orderDetailService {
 		}
 		OptionalBook.get().setQuantity(OptionalBook.get().getQuantity()-order.getQuantity());
 		bookRepo.save(OptionalBook.get());
-		
-		List<orderDetails> orders = new ArrayList<orderDetails>();
 		
 		orderDetails UpdatedOrder = new orderDetails();
 		UpdatedOrder.setOrderId(order.getOrderId());

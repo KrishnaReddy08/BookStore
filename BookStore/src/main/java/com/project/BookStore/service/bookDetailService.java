@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,10 +11,8 @@ import org.springframework.stereotype.Service;
 import com.project.BookStore.DTO.responseStructure;
 import com.project.BookStore.exception.BookNotFoundException;
 import com.project.BookStore.exception.InvalidPropertiesException;
-import com.project.BookStore.exception.InvalidRequestException;
 import com.project.BookStore.model.book;
 import com.project.BookStore.repository.bookRepo;
-import com.project.BookStore.repository.orderDetailsRepo;
 
 import jakarta.transaction.Transactional;
 
@@ -25,9 +22,6 @@ public class bookDetailService {
 	
 	@Autowired
 	private bookRepo repo;
-	
-	@Autowired
-	private orderDetailsRepo OrderRepo;
 	
 	public ResponseEntity<responseStructure<book>> addBook(book book){
 		responseStructure<book> structure = new responseStructure<book>();

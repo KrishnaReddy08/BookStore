@@ -1,14 +1,12 @@
 package com.project.BookStore.JWT;
 
-import com.project.BookStore.exception.InvalidJwtTokenSignatureException;
+import com.project.BookStore.exception.InvalidJwtTokenException;
 import com.project.BookStore.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,12 +30,10 @@ public class JWTFilter extends OncePerRequestFilter {
         String AuthHeader = request.getHeader("Authorization");
         String Token;
         String UserName;
-
-        if (AuthHeader != null && AuthHeader.startsWith("Bearer")) {
-            Token = AuthHeader.substring(7);
-            UserName = jwtservice.extractUsername(Token);
-
-            try {
+        try {
+            if (AuthHeader != null && AuthHeader.startsWith("Bearer")) {
+                Token = AuthHeader.substring(7);
+                UserName = jwtservice.extractUsername(Token);
 
                 if (UserName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userService.loadUserByUsername(UserName);
@@ -49,11 +45,15 @@ public class JWTFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     }
                 }
-            } catch (InvalidJwtTokenSignatureException e) {
-                throw new InvalidJwtTokenSignatureException("INVALID JWT TOKEN SIGNATURE");
             }
+            filterChain.doFilter(request, response);
+        }
+        catch (InvalidJwtTokenException e){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write(e.getMessage());
+            response.getWriter().flush();
 
         }
-        filterChain.doFilter(request, response);
+
     }
 }

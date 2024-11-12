@@ -1,48 +1,36 @@
 package com.project.BookStore.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.BookStore.DTO.CustomerDetailDTO;
 import com.project.BookStore.DTO.responseStructure;
 import com.project.BookStore.JWT.jwtservice;
 import com.project.BookStore.model.customer;
-import com.project.BookStore.repository.bookRepo;
 import com.project.BookStore.repository.customerRepo;
 import com.project.BookStore.service.UserService;
-import com.project.BookStore.service.bookDetailService;
+
 import com.project.BookStore.service.customerDetailService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.engine.TestExecutionResult;
-import org.mockito.Mockito;
-import org.springdoc.core.properties.SwaggerUiConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -70,15 +58,12 @@ class customerDetailControllerTest {
     private responseStructure<List<CustomerDetailDTO>> Liststructure;
     private ResponseEntity<responseStructure<List<CustomerDetailDTO>>> Listresponse;
 
-    private  CustomerDetailDTO dto;
     private  customer customer;
     private List<customer> customers = new ArrayList<>();
 
 
     @BeforeEach
     void setUp() {
-        dto = new CustomerDetailDTO();
-
         customer = new customer();
 
         customers.add(customer);
@@ -93,7 +78,6 @@ class customerDetailControllerTest {
 
     @AfterEach
     void tearDown() {
-        dto = null;
         structure = null;
         response = null;
         Listresponse = null;

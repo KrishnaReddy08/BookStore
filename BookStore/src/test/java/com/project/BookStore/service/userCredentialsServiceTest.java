@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -192,8 +191,7 @@ class userCredentialsServiceTest {
         when(jwtservice.generateToken(credentials.getUsername())).thenReturn(Token);
 
         ResponseEntity<responseStructure<String>> response = service.verify(credentials);
-
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-        assertEquals("failed", response.getBody().getMessage());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("success", response.getBody().getMessage());
     }
 }

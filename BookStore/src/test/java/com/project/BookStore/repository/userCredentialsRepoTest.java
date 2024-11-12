@@ -2,9 +2,6 @@ package com.project.BookStore.repository;
 
 import com.project.BookStore.model.Role;
 import com.project.BookStore.model.userCredentials;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.metamodel.EntityType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

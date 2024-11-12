@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 
-import com.project.BookStore.exception.InvalidJwtTokenSignatureException;
 import com.project.BookStore.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

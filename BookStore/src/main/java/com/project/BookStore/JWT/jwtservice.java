@@ -1,6 +1,6 @@
 package com.project.BookStore.JWT;
 
-import com.project.BookStore.exception.InvalidJwtTokenSignatureException;
+import com.project.BookStore.exception.InvalidJwtTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -66,7 +66,7 @@ public class jwtservice {
                     .getPayload();
         }
         catch (SignatureException exception){
-            throw new InvalidJwtTokenSignatureException("Invalid Signature");
+            throw new InvalidJwtTokenException("Invalid JWT Token");
         }
     }
 

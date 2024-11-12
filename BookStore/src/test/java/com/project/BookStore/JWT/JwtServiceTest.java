@@ -1,9 +1,8 @@
 package com.project.BookStore.JWT;
 
-import com.project.BookStore.exception.InvalidJwtTokenSignatureException;
+import com.project.BookStore.exception.InvalidJwtTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.InvalidKeyException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -93,7 +92,7 @@ public class JwtServiceTest {
     @Test
     void testInvalidJwtTokenSignatureException() {
         String invalidToken = token + "invalid";
-        assertThrows(InvalidJwtTokenSignatureException.class, () -> {
+        assertThrows(InvalidJwtTokenException.class, () -> {
             jwtService.extractsAllClaims(invalidToken);
         });
     }

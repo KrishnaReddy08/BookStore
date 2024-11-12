@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.BookStore.DTO.OrderDetailDTO;
 import com.project.BookStore.DTO.responseStructure;
-import com.project.BookStore.model.orderDetails;
 import com.project.BookStore.service.orderDetailService;
 
 
