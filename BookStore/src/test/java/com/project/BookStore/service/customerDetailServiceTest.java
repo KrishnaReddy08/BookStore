@@ -260,21 +260,4 @@ class customerDetailServiceTest {
         });
     }
 
-    @Test
-    void deleteCustomerByName() {
-        List<customer> customers = new ArrayList<>();
-        customers.add(customer);
-        when(repo.findByName("name")).thenReturn(Optional.of(customers));
-        ResponseEntity<responseStructure<List<CustomerDetailDTO>>> response = service.deleteCustomerByName("name");
-
-        assertEquals(HttpStatus.ACCEPTED,response.getStatusCode());
-        assertEquals("Deleted Successfully",response.getBody().getMessage());
-        assertEquals(customers.get(0).getEmail(),response.getBody().getData().get(0).getEmail());
-
-
-        when(repo.findByName("name")).thenReturn(Optional.empty());
-        assertThrows(CustomerNotFoundException.class, ()->{
-            service.deleteCustomerByName("name");
-        });
-    }
 }

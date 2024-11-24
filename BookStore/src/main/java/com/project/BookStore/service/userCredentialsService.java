@@ -168,7 +168,6 @@ public class userCredentialsService {
 		try {
 			Authentication authentication = authmanager.authenticate(
 					new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-			System.out.println("Authentication successful: " + authentication.isAuthenticated());
 				String token = jwtservice.generateToken(user.getUsername());
 				structure.setData(token);
 				structure.setMessage("success");

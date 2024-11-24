@@ -26,7 +26,6 @@ public class customerDetailController {
 	
 	@PostMapping("/admin/addcustomer")
 	public  ResponseEntity<responseStructure<CustomerDetailDTO>> addCustomer(@RequestBody customer customer) {
-		System.out.println("in controller"+customer);
 		return service.addCustomer(customer);
 	}
 	
@@ -73,10 +72,5 @@ public class customerDetailController {
 	public  ResponseEntity<responseStructure<CustomerDetailDTO>> deleteCurrentCustomer(){
 		return service.deleteCurrentCustomer();
 	}
-	
-	@DeleteMapping("/admin/deletecustomerbyname/{name}")
-	public  ResponseEntity<responseStructure<List<CustomerDetailDTO>>> deleteCustomerByname(@PathVariable String name) {
-		return service.deleteCustomerByName(name);
-	}
-			
+
 }

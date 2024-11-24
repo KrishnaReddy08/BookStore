@@ -93,6 +93,8 @@ public class orderDetailService {
 		int id =credentials.findByUsername(AuthenticatedUserDetails.getCurrentUser()).get().getCustomerId();
 		Optional<customer> OptionalCustomer = customerRepo.findById(id);
 		Optional<book> OptionalBook = bookRepo.findById(order.getBookId());
+		Optional<orderDetails> OptionalOrder = repo.findById(order.getOrderId());
+		if(OptionalOrder.isPresent()) throw new InvalidRequestException("Order with The Id "+order.getOrderId()+" Already Exists");
 		if(OptionalBook.isEmpty()) throw new BookNotFoundException("Unable To Place Order With Book Id "+order.getBookId()+" Cause Book With Specified Id Not Found");
 		if(OptionalCustomer.isEmpty()) throw new CustomerNotFoundException("Unable To Place Order With Customer Id "+id+" Cause Customer Details With Specified Id Not Found");
 		orderDetails UpdatedOrder = new orderDetails();

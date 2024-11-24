@@ -180,12 +180,4 @@ class customerDetailControllerTest {
                     .andExpect(status().isAccepted());
     }
 
-    @Test
-    @WithMockUser(username = "admin",roles = "ADMIN")
-    void deleteCustomerByname() throws Exception {
-        when(service.deleteCustomerByName("name")).thenReturn(new ResponseEntity<responseStructure<List<CustomerDetailDTO>>>(Liststructure,HttpStatus.ACCEPTED));
-
-        mockMvc.perform(delete("/admin/deletecustomerbyname/name").with(csrf()))
-                .andExpect(status().isAccepted());
-    }
 }
